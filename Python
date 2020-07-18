@@ -3,7 +3,6 @@ import schedule	  # Imports the Schedule Library (which allows scheduling based 
 import time		  # Import the Time Library (which includes sleep durations)
 
 GPIO.setmode(GPIO.BCM)         # Numbers the physical GPIO pins by Broadcom chip-specific pin numbers. These pin numbers follow the lower-level numbering system defined by the Raspberry Pi's Broadcom-chip brain.
-
 LedPin = 25		  # The LED is connected to physical GPIO pin 25
 buttonPin = 12		  # The button is connected to physical GPIO pin 12
 
@@ -17,21 +16,21 @@ pwm = GPIO.PWM(LedPin, 200)     # set up the channel and the frequecy (200Hz) of
 def fade_led():
     try:
         while True:    # Runs the following code an infinite loop to pulse the LED until the button is pressed to stop it
-                pwm.start(0)   # Starts the LED pulse width modulation
-                for dc in range(0, 101, 5):   # Increases the duty cycle: 0%~100%, stepping dc up by 5 each loop, to increase the brightness of the LED
-                        pwm.ChangeDutyCycle(dc)     # Changes the duty cycle to change the brightness of the LED
-                        time.sleep(0.05)   # Wait .05 seconds at current LED brightness
-                buttonState = GPIO.input(buttonPin)    # this and the following two code lines check to see if the button is pushed, and if so goes to the SystemExit line
-                if buttonState == False:
-                    raise SystemExit    
-                time.sleep(0.75)   # Pause with the LED fully on for 0.75 seconds
-                for dc in range(100, -1, -5):   # Decreases the duty cycle: 100%~0%, stepping dc down by 5 each loop, to dim the brightness of the LED
-                        pwm.ChangeDutyCycle(dc)   # Changes the duty cycle to change the brightness of the LED
-                        time.sleep(0.05)   # Wait .05 seconds at current LED brightness
-                buttonState = GPIO.input(buttonPin)    # this and the following two code lines check to see if the button is pushed, and if so goes to the SystemExit line
-                if buttonState == False:
-                    raise SystemExit    
-                time.sleep(0.75)   # Pause with the LED fully off for 0.75 seconds
+            pwm.start(0)   # Starts the LED pulse width modulation
+            for dc in range(0, 101, 5):   # Increases the duty cycle: 0%~100%, stepping dc up by 5 each loop, to increase the brightness of the LED
+                pwm.ChangeDutyCycle(dc)     # Changes the duty cycle to change the brightness of the LED
+                time.sleep(0.05)   # Wait .05 seconds at current LED brightness
+            buttonState = GPIO.input(buttonPin)    # this and the following two code lines check to see if the button is pushed, and if so goes to the SystemExit line
+            if buttonState == False:
+                raise SystemExit    
+            time.sleep(0.75)   # Pause with the LED fully on for 0.75 seconds
+            for dc in range(100, -1, -5):   # Decreases the duty cycle: 100%~0%, stepping dc down by 5 each loop, to dim the brightness of the LED
+                pwm.ChangeDutyCycle(dc)   # Changes the duty cycle to change the brightness of the LED
+                time.sleep(0.05)   # Wait .05 seconds at current LED brightness
+            buttonState = GPIO.input(buttonPin)    # this and the following two code lines check to see if the button is pushed, and if so goes to the SystemExit line
+            if buttonState == False:
+                raise SystemExit    
+            time.sleep(0.75)   # Pause with the LED fully off for 0.75 seconds
     except SystemExit:   # When you press the button, the infinite loop will stop and the following will be called
         pwm.stop()   #Stops the LED pulse width modulation
         GPIO.output(LedPin, GPIO.LOW)    # Turns off the LED by setting the LedPin value to low (0 volts)
