@@ -38,7 +38,6 @@ def fade_led():
 schedule.every().day.at("06:00").do(fade_led)      # Creates a schedule for the LED to pulse every day beginning at 6:00 am until the button is pushed to turn it off
 schedule.every(2).days.at("20:30").do(fade_led)    # Creates a schedule for the LED to pulse every other day beginning at 8:30 pm until the button is pushed to turn it off
 
-
 try:
     while True:                      # Runs the following code in an infinite loop to pulse the LED according to the schedules above until the button is pressed to stop it
         schedule.run_pending()
