@@ -11,7 +11,7 @@ GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Set buttonPin mode a
 GPIO.setup(LedPin, GPIO.OUT)   # Set LedPin mode as an output pin
 GPIO.output(LedPin, GPIO.LOW)  # Set LedPin initial value to low (0V)
 
-pwm = GPIO.PWM(LedPin, 200)    # set up the channel and the frequecy (200Hz) of the PWM signal
+pwm = GPIO.PWM(LedPin, 200)    # set up the channel and the frequency (200Hz) of the PWM signal
 
 def fade_led():
     try:
