@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO   # Imports the GPIO Library which enables us to program the GPIO pins on the Raspberry Pi
-import schedule	          # Imports the Schedule Library (which allows scheduling based on time of day, etc.)
-import time		          # Imports the Time Library (which includes sleep durations)
+import schedule           # Imports the Schedule Library (which allows scheduling based on time of day, etc.)
+import time               # Imports the Time Library (which includes sleep durations)
 
 GPIO.setmode(GPIO.BCM)    # Numbers the physical GPIO pins by Broadcom chip-specific pin numbers. These pin numbers follow the lower-level numbering system defined by the Raspberry Pi's Broadcom-chip brain.
 LedPin = 25		          # The LED is connected to physical GPIO pin 25
