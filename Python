@@ -3,8 +3,8 @@ import schedule           # Imports the Schedule Library (which allows schedulin
 import time               # Imports the Time Library (which includes sleep durations)
 
 GPIO.setmode(GPIO.BCM)    # Numbers the physical GPIO pins by Broadcom chip-specific pin numbers. These pin numbers follow the lower-level numbering system defined by the Raspberry Pi's Broadcom-chip brain.
-LedPin = 25		          # The LED is connected to physical GPIO pin 25
-buttonPin = 12		      # The button is connected to physical GPIO pin 12
+LedPin = 25               # The LED is connected to physical GPIO pin 25
+buttonPin = 12            # The button is connected to physical GPIO pin 12
 
 GPIO.setwarnings(False)        # If the GPIO pin we are trying to use is doing some other function, we will receive warnings while executing the program. This command tells the GPIO pin to ignore the warnings and proceed with the program.
 GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Set buttonPin mode as an input pin with a pull-up resistor
