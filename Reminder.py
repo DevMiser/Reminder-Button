@@ -1,3 +1,5 @@
+# the following program is provided by DevMiser - https://github.com/DevMiser
+
 import datetime
 import RPi.GPIO as GPIO
 import schedule
