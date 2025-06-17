@@ -2,11 +2,11 @@
 # this program is in MicroPython for running on a Raspberry Pi Pico W
 
 import machine
-import network # handles connecting to WiFi
-import time
-import ntptime # handles connecting to network time protocol (NTP)
+import network # handles connecting to WiFi 
+import utime
+import ntptime  # handles connecting to network time protocol (NTP)
 
-# Fill in your WiFi network name (ssid) and password here:
+# Set your network name (SSID) and password here:
 ssid = ''
 password = ''
 
@@ -17,7 +17,7 @@ def connect():
     wlan.connect(ssid, password)
     while not wlan.isconnected():
         print('Waiting for connection...')
-        time.sleep(1)
+        utime.sleep(1)
     ip = wlan.ifconfig()[0]
     print(f'Connected on {ip}')
 
@@ -34,46 +34,49 @@ button = machine.Pin(buttonPin, machine.Pin.IN, machine.Pin.PULL_UP)
 # Global variable to control LED pulsing
 pulse = True
 
-# Function to stop LED pulsing upon button push
-
+# Function to stop pulsing LED
 def button_pressed(pin):
     global pulse
     if pulse:
-        time_now = time.localtime(time.mktime(time.localtime()) - 4 * 60 * 60)
+        time_now = utime.localtime()
         formatted_time = "{:02d}-{:02d}-{:04d} {:02d}:{:02d} {}".format(
-        time_now[1], time_now[2], time_now[0],
-        (time_now[3] % 12) or 12,  # Convert to 12-hour format
-        time_now[4],
-        "AM" if time_now[3] < 12 else "PM"
+            time_now[1], time_now[2], time_now[0], time_now[3], time_now[4],
+            "AM" if time_now[3] < 12 else "PM"
         )
         print("LED stopped by button at", formatted_time)
     pulse = False
+    # Immediately turn off the LED when the button is pressed
+    led.duty_u16(0) 
 
 # Function to pulse LED
 def fade_led():
     global pulse
-    if pulse:
-        time_now = time.localtime(time.mktime(time.localtime()) - 4 * 60 * 60)
-        formatted_time = "{:02d}-{:02d}-{:04d} {:02d}:{:02d} {}".format(
-        time_now[1], time_now[2], time_now[0],
-        (time_now[3] % 12) or 12,  # Convert to 12-hour format
-        time_now[4],
-        "AM" if time_now[3] < 12 else "PM"
-        )
-        print("LED pulsing started at", formatted_time)
-    while pulse:
+    while pulse: # Keep pulsing as long as 'pulse' is True
         for dc in range(0, 65536, 3277):  # Increase duty cycle: 0~65535
+            if not pulse: # Check if button was pressed during fade-in
+                break
             led.duty_u16(dc)
-            time.sleep_ms(50)
-        time.sleep(1)
+            utime.sleep_ms(50)
+        
+        if not pulse: # Check after fade-in loop
+            break
+            
+        utime.sleep(1) # Pause at full brightness
+        
         for dc in range(65535, -1, -3277):  # Decrease duty cycle: 65535~0
+            if not pulse: # Check if button was pressed during fade-out
+                break
             led.duty_u16(dc)
-            time.sleep_ms(50)
-        led.duty_u16(0)
-        time.sleep(1)
+            utime.sleep_ms(50)
+        
+        if not pulse: # Check after fade-out loop
+            break
+            
+        led.duty_u16(0) # Ensure LED is off after a full pulse cycle
+        utime.sleep(1) # Pause when off
 
 # Button interrupt
-button.irq(trigger=machine.Pin.IRQ_RISING, handler=button_pressed)
+button.irq(trigger=machine.Pin.IRQ_FALLING, handler=button_pressed)
 
 # Connect to WiFi
 connect()
@@ -82,15 +85,24 @@ connect()
 ntptime.settime()
 
 # Schedule LED pulsing based on time
-while True:
+try:
+    while True:
+        current_time = utime.localtime(utime.mktime(utime.localtime()) - 4 * 60 * 60) # adjusts 4 hours from UTC for NYC time
+        # Adjust these times as needed for your desired schedule.
+        if current_time[3] == 6 and current_time[4] == 30:  # 6:30 AM
+            pulse = True
+            fade_led()
+            led.duty_u16(0)
+            utime.sleep(60) # Sleep to avoid re-entering the fade_led for the same minute
 
-    current_time = time.localtime(time.mktime(time.localtime()) - 4 * 60 * 60) # adjusts 4 hours from UTC
-    if current_time[3] == 6 and current_time[4] == 30: #6:30 AM - hours [3] are in 24 hour format
-        pulse = True
-        fade_led() 
-        time.sleep(60)
-    elif current_time[3] == 20 and current_time[4] == 30: #8:30 PM - hours [3] are in 24 hour format
-        pulse = True
-        fade_led()
-        time.sleep(60)
-    time.sleep(1)
+# Use the follwoing if you want to use more than one time per day:
+        elif current_time[3] == 20 and current_time[4] == 00:  # 8:00 PM
+            pulse = True
+            fade_led()
+            led.duty_u16(0)
+            utime.sleep(60) # Sleep to avoid re-entering the fade_led for the same minute
+        utime.sleep(1)
+        
+except KeyboardInterrupt:
+    led.duty_u16(0) # Ensure LED is off on manual program termination
+    machine.reset()
